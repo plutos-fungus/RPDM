@@ -1,0 +1,31 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    
+    <SolidColorBrush x:Key="DefaultText" Color="Black"></SolidColorBrush>
+    <SolidColorBrush x:Key="DefaultBackground" Color="White"></SolidColorBrush>
+    <SolidColorBrush x:Key="DefaultButtonBackground" Color="#FFDDDDDD"></SolidColorBrush>
+
+
+    <!-- COLORS -->
+    <SolidColorBrush x:Key="GruvboxDarkText" Color="#a89984"></SolidColorBrush>
+    <SolidColorBrush x:Key="GruvboxForeground" Color="#ebdbb2"></SolidColorBrush>
+    <SolidColorBrush x:Key="GruvboxBackground2" Color="#3c3836"></SolidColorBrush>
+    <SolidColorBrush x:Key="GruvboxBackground" Color="#1d2021"></SolidColorBrush>
+    <SolidColorBrush x:Key="GruvboxBorderBrush" Color="#ebdbb2"></SolidColorBrush>
+
+
+
+    <!-- BUTTONS -->
+    <!--<ListBox x:Key="ListBoxTheme">
+        <ListBox.Resources>
+            <DataTemplate>
+                <Border BorderBrush="AliceBlue" CornerRadius="8">
+                </Border>
+            </DataTemplate>
+        </ListBox.Resources>
+    </ListBox>-->
+
+
+
+</ResourceDictionary>
