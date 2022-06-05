@@ -27,7 +27,7 @@ namespace RedditPlaceCanvas.Model
     public class DataRetriever
     {
         SQLData sd = new();
-        private static readonly string connStr = "";
+        private static readonly string connStr = "Server=192.168.30.183;Database=ThisOne;User Id=SA;Password=!23456789ABc";
         //public List<String> ColorList = new();
         //public List<int> XCoord = new();
         //public List<int> YCoord = new();
@@ -60,34 +60,90 @@ namespace RedditPlaceCanvas.Model
             sd.YArray = new int[sd.j];
             sd.Coords = new string[sd.j];
         }
-        int test = 0;
-        public void DataReader()
+
+
+
+        public void DataReaderXArray()
+        {
+            int i = 0;
+            using (SqlConnection conn = new(connStr))
+            {
+                conn.Open();
+                SqlCommand command = new("SELECT XCoord FROM RedditPlaces ORDER BY Id DESC;", conn);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        sd.XArray[i] = Convert.ToInt32(reader["XCoord"]);
+                        i++;
+                    }
+                }
+            }
+        }
+
+        public void DataReaderYArray()
+        {
+            int i = 0;
+            using (SqlConnection conn = new(connStr))
+            {
+                conn.Open();
+                SqlCommand command = new("SELECT YCoord FROM RedditPlaces ORDER BY Id DESC;", conn);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        sd.YArray[i] = Convert.ToInt32(reader["YCoord"]);
+                        i++;
+                    }
+                }
+            }
+        }
+
+        public void DataReaderCoordArray()
+        {
+            int i = 0;
+            using (SqlConnection conn = new(connStr))
+            {
+                conn.Open();
+                SqlCommand command = new("SELECT XCoord, YCoord FROM RedditPlaces ORDER BY Id DESC;", conn);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        sd.Coords[i] = Convert.ToString(reader["XCoord"]) + " " + Convert.ToString(reader["YCoord"]);
+                        i++;
+                    }
+                }
+            }
+        }
+
+        public void DataReaderColorList()
         {
             using (SqlConnection conn = new(connStr))
             {
                 conn.Open();
-                SqlCommand command = new("SELECT Id, UserUUID, Color, XCoord, YCoord FROM RedditPlaces ORDER BY Id DESC;", conn);
+                SqlCommand command = new("SELECT Color FROM RedditPlaces ORDER BY Id DESC;", conn);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    //if (reader.Read())
-                    //{
-                    //    for (int i = 0; i < sd.j; i++)
-                    //    {
-                    //        sd.XArray[i] = Convert.ToInt32(reader["XCoord"]);
-                    //        sd.YArray[i] = Convert.ToInt32(reader["YCoord"]);
-                    //        sd.Coords[i] = Convert.ToString(reader["XCoord"]) + " " + Convert.ToString(reader["YCoord"]);
-                    //        sd.ColorList.Add(Convert.ToString(reader["Color"]));
-                    //        sd.User.Add(Convert.ToString(reader["UserUUID"]));
-                    //    }
-                    //}
                     while (reader.Read())
                     {
-                        sd.XArray[test] = Convert.ToInt32(reader["XCoord"]);
-                        sd.YArray[test] = Convert.ToInt32(reader["YCoord"]);
-                        sd.Coords[test] = Convert.ToString(reader["XCoord"]) + " " + Convert.ToString(reader["YCoord"]);
                         sd.ColorList.Add(Convert.ToString(reader["Color"]));
+                    }
+                }
+            }
+        }
+
+        public void DataReaderUserList()
+        {
+            using (SqlConnection conn = new(connStr))
+            {
+                conn.Open();
+                SqlCommand command = new("SELECT UserUUID FROM RedditPlaces ORDER BY Id DESC;", conn);
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
                         sd.User.Add(Convert.ToString(reader["UserUUID"]));
-                        test++;
                     }
                 }
             }

@@ -39,7 +39,7 @@ namespace RedditPlaceCanvas.View
         DataRetriever dr = new();
         StringSetter ss = new();
         private static readonly string ReadString = @"C:\Users\Rasmus\Desktop\Reddit_Project\RPDM\RedditPlaceCanvas\RedditPlaceCanvas\bin\Debug\net6.0-windows\02_header.txt";
-        private static readonly string connStr = "";
+        private static readonly string connStr = "Server=192.168.30.183;Database=ThisOne;User Id=SA;Password=!23456789ABc";
         
 
         public MainWindow()
@@ -49,27 +49,57 @@ namespace RedditPlaceCanvas.View
 
         private void PopularUser_Click(object sender, RoutedEventArgs e)
         {
-            dr.WhoPlacedMost();
-            CountedUsersListBox.ItemsSource = dr.countedUser;
+
         }
 
         private void PopularColor_Click(object sender, RoutedEventArgs e)
         {
-            dr.MostPopularColor();
-            CountedColorListBox.ItemsSource = dr.countedColor;
+
         }
 
         private void PopularCoord_Click(object sender, RoutedEventArgs e)
         {
-            dr.MostPopularCoord();
-            CountedCoordListBox.ItemsSource = dr.CountedCoords;
-            dr.ClearList();
+
+
         }
 
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
-            dr.DataReader();
-            
+            Thread th1 = new(dr.DataReaderXArray);
+            Thread th2 = new(dr.DataReaderYArray);
+            Thread th3 = new(dr.DataReaderCoordArray);
+            Thread th4 = new(dr.DataReaderColorList);
+            Thread th5 = new(dr.DataReaderUserList);
+            Thread th6 = new(dr.WhoPlacedMost);
+            Thread th7 = new(dr.MostPopularColor);
+            Thread th8 = new(dr.MostPopularCoord);
+
+            th1.Start();
+            th2.Start();
+            th3.Start();
+            th4.Start();
+            th5.Start();
+           
+            th1.Join();
+            th2.Join();
+            th3.Join();
+            th4.Join();
+            th5.Join();
+
+            th6.Start();
+            th7.Start();
+            th8.Start();
+
+            th6.Join();
+            th7.Join();
+            th8.Join();
+
+            CountedUsersListBox.ItemsSource = dr.countedUser;
+            CountedColorListBox.ItemsSource = dr.countedColor;
+            CountedCoordListBox.ItemsSource = dr.CountedCoords;
+
+            dr.ClearList();
+
             //SettingsWindow sw = new();
             //sw.Show();
         }
