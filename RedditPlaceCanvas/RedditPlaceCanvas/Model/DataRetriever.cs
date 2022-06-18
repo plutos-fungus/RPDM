@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading;
 
 namespace RedditPlaceCanvas.Model
 {
@@ -18,21 +19,25 @@ namespace RedditPlaceCanvas.Model
         //public List<string> Coords = new();
         public List<string> User = new();
 
-        public int j = 0;
-        public int[]? XArray;
-        public int[]? YArray;
-        public string[]? Coords;
+        
     }
 
     public class DataRetriever
     {
         SQLData sd = new();
         private static readonly string connStr = "Server=192.168.30.183;Database=ThisOne;User Id=SA;Password=!23456789ABc";
+        private static readonly string ReadString = @"C:\Users\Rasmus\Desktop\Reddit_Project\RPDM\RedditPlaceCanvas\RedditPlaceCanvas\bin\Debug\net6.0-windows\oof.txt";
         //public List<String> ColorList = new();
         //public List<int> XCoord = new();
         //public List<int> YCoord = new();
         //public List<string> Coords = new();
         //public List<string> User = new();
+
+        public int j = 0;
+        public int[]? XArray;
+        public int[]? YArray;
+        public string[]? Coords;
+
 
         public ObservableCollection<string> CountedCoords = new();
         public ObservableCollection<string> countedUser = new();
@@ -46,22 +51,19 @@ namespace RedditPlaceCanvas.Model
                 SqlCommand command = new("SELECT Id FROM RedditPlaces ORDER BY Id DESC;", conn);
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    //while (reader.Read())
                     if (reader.Read())
                     {
                         for (int i = 0; i < 1; i++)
                         {
-                            sd.j = Convert.ToInt32(reader["Id"]);
+                            j = Convert.ToInt32(reader["Id"]);
                         }
                     }
                 }
             }
-            sd.XArray = new int[sd.j];
-            sd.YArray = new int[sd.j];
-            sd.Coords = new string[sd.j];
+            XArray = new int[j];
+            YArray = new int[j];
+            Coords = new string[j];
         }
-
-
 
         public void DataReaderXArray()
         {
@@ -74,7 +76,7 @@ namespace RedditPlaceCanvas.Model
                 {
                     while (reader.Read())
                     {
-                        sd.XArray[i] = Convert.ToInt32(reader["XCoord"]);
+                        XArray[i] = Convert.ToInt32(reader["XCoord"]);
                         i++;
                     }
                 }
@@ -92,7 +94,7 @@ namespace RedditPlaceCanvas.Model
                 {
                     while (reader.Read())
                     {
-                        sd.YArray[i] = Convert.ToInt32(reader["YCoord"]);
+                        YArray[i] = Convert.ToInt32(reader["YCoord"]);
                         i++;
                     }
                 }
@@ -110,7 +112,7 @@ namespace RedditPlaceCanvas.Model
                 {
                     while (reader.Read())
                     {
-                        sd.Coords[i] = Convert.ToString(reader["XCoord"]) + " " + Convert.ToString(reader["YCoord"]);
+                        Coords[i] = Convert.ToString(reader["XCoord"]) + " " + Convert.ToString(reader["YCoord"]);
                         i++;
                     }
                 }
@@ -160,6 +162,7 @@ namespace RedditPlaceCanvas.Model
             {
                 countedUser.Add(g.Key + @" : " + g.Count());
             }
+            userGroup = null;
         }
 
         public void MostPopularColor()
@@ -169,27 +172,59 @@ namespace RedditPlaceCanvas.Model
             {
                 countedColor.Add(c.Key + @" : " + c.Count());
             }
+            colorGroup = null;
         }
 
         public void MostPopularCoord()
         {
-            var coordGroup = sd.Coords.GroupBy(i => i);
+            var coordGroup = Coords.GroupBy(i => i);
             foreach (var c in coordGroup)
             {
                 CountedCoords.Add(c.Key + @" : " + c.Count());
             }
+            coordGroup = null;
         }
 
         public void ClearList()
         {
             sd.ColorList.Clear();
-            Array.Clear(sd.XArray, 0, sd.XArray.Length);
-            sd.XArray = new int[0];
-            Array.Clear(sd.YArray, 0, sd.YArray.Length);
-            sd.YArray = new int[0];
-            Array.Clear(sd.Coords, 0, sd.Coords.Length);
-            sd.Coords = new string[0];
+            Array.Clear(XArray, 0, XArray.Length);
+            XArray = null;
+            Array.Clear(YArray, 0, YArray.Length);
+            YArray = null;
+            Array.Clear(Coords, 0, Coords.Length);
+            Coords = null;
             sd.User.Clear();
+        }
+
+        public void DataInserter()
+        {
+            using (SqlConnection conn = new(connStr))
+            {
+                string Temp = new("");
+                string[] InserterArray;
+                conn.Open();
+                SqlTransaction transaction = conn.BeginTransaction();
+                foreach (string s in File.ReadLines(ReadString))
+                {
+                    Temp = s;
+                    Temp = Temp.Replace("UTC", "");
+                    Temp = Temp.Replace('"', ' ');
+                    InserterArray = Temp.Split(',');
+                    InserterArray[3].Trim(' ');
+                    InserterArray[4].Trim(' ');
+
+                    SqlCommand command = new("INSERT INTO RedditPlaces (PixelTime, UserUUID, Color, XCoord, YCoord) " + "VALUES (@pixelTime, @userUUID, @color, @xCoord, @yCoord)", conn, transaction);
+                    command.Parameters.Add("@PixelTime", System.Data.SqlDbType.DateTime2).Value = DateTime.Parse(InserterArray[0]);
+                    command.Parameters.Add("@UserUUID", System.Data.SqlDbType.NVarChar).Value = InserterArray[1].ToString();
+                    command.Parameters.Add("@color", System.Data.SqlDbType.NVarChar).Value = InserterArray[2].ToString();
+                    command.Parameters.Add("@xCoord", System.Data.SqlDbType.Int).Value = int.Parse(InserterArray[3]);
+                    command.Parameters.Add("@yCoord", System.Data.SqlDbType.Int).Value = int.Parse(InserterArray[4]);
+                    command.ExecuteNonQuery();
+                }
+                transaction.Commit();
+                transaction.Dispose();
+            }
         }
 
         ~DataRetriever()

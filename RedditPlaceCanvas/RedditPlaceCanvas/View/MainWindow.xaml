@@ -92,7 +92,5 @@
             </ListBox.Resources>
         </ListBox>
         <Rectangle Grid.Column="6" Width="10"/>
-
-        <ProgressBar x:Name="InserterProgress" HorizontalAlignment="Left" Height="41" Width="163" Margin="20,371,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>
